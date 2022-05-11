@@ -71,13 +71,13 @@ export default class WebDriverClientFactory {
     const serverUrl = "http://127.0.0.1:9515";
 
     if (browserName === Browser.Edge) {
-      return this.edgeWebDeriver(serverUrl);
+      return this.createEdgeWebDriverBuilder(serverUrl);
     } else {
-      return this.chromeWebDriver(browserPath, serverUrl);
+      return this.createChromeWebDriverBuilder(browserPath, serverUrl);
     }
   }
 
-  private chromeWebDriver(
+  private createChromeWebDriverBuilder(
     browserPath: string,
     serverUrl: string
   ): ThenableWebDriver {
@@ -99,7 +99,7 @@ export default class WebDriverClientFactory {
       .build();
   }
 
-  private edgeWebDeriver(serverUrl: string): ThenableWebDriver {
+  private createEdgeWebDriverBuilder(serverUrl: string): ThenableWebDriver {
     const caps = new Capabilities();
     caps.setPageLoadStrategy("eager");
     return new Builder()

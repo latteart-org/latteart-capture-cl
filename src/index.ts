@@ -96,7 +96,7 @@ enum ServerToClientSocketIOEvent {
  */
 async function startWebDriverServer(
   platformName: PlatformName,
-  browerName: Browser
+  browserName: Browser
 ): Promise<WebDriverServer | null> {
   if (await ChromeDriverHealthChecker.chromeDriverIsStarted()) {
     return new WebDriverServer();
@@ -105,7 +105,7 @@ async function startWebDriverServer(
   return new Promise((resolve) => {
     if (platformName === PlatformName.PC) {
       const proc = spawn(
-        browerName === Browser.Edge ? "msedgedriver" : "chromedriver"
+        browserName === Browser.Edge ? "msedgedriver" : "chromedriver"
       );
 
       proc.on("error", (error) => {
@@ -121,7 +121,7 @@ async function startWebDriverServer(
         if (
           message.includes(
             `${
-              browerName === Browser.Edge ? "EdgeDriver" : "ChromeDriver"
+              browserName === Browser.Edge ? "EdgeDriver" : "ChromeDriver"
             } was started successfully.`
           )
         ) {
