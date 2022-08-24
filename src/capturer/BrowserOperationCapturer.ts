@@ -470,7 +470,11 @@ export default class BrowserOperationCapturer {
             await this.client.selectOption(xpath, operation.input);
           }
 
-          if (operation.elementInfo.tagname.toLowerCase() === "input") {
+          if (
+            ["input", "textarea"].includes(
+              operation.elementInfo.tagname.toLowerCase()
+            )
+          ) {
             await this.client.clearAndSendKeysToElement(xpath, operation.input);
           }
 

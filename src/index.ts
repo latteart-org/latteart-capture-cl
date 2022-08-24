@@ -174,6 +174,7 @@ socket.on("connection", (socket) => {
           device: captureConfig.device,
           browserBinaryPath: "",
           webDriverServer: server,
+          isHeadlessMode: captureConfig.isHeadlessMode,
         });
 
         capturer = new BrowserOperationCapturer(client, captureConfig, {
