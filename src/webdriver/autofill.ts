@@ -212,7 +212,7 @@ export default class Autofill {
   private async getWebElementsByRegexXpath(
     locator: string
   ): Promise<WebElement[]> {
-    const regex = new RegExp(locator.toLocaleUpperCase());
+    const regex = new RegExp(locator);
     if (!this.xpathList) {
       if (this.pageSource === null) {
         this.pageSource = await this.client.getCurrentPageSource();
@@ -220,7 +220,7 @@ export default class Autofill {
       this.xpathList = this.getAllXpath(this.pageSource);
     }
     const matchXpath = this.xpathList.filter((xpath) => {
-      return regex.test(xpath.toLocaleUpperCase());
+      return regex.test(xpath);
     });
 
     return Promise.all(
@@ -234,7 +234,7 @@ export default class Autofill {
     const result: string[] = [];
 
     const getTagName = (element: Node): string => {
-      return (element as any).rawTagName;
+      return (element as any).rawTagName.toLowerCase();
     };
 
     const elementSearch = (element: Node, path: string[], index: number) => {
