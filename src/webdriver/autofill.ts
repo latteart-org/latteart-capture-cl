@@ -220,6 +220,9 @@ export default class Autofill {
     try {
       regex = new RegExp(locator);
     } catch (error) {
+      if (error instanceof Error) {
+        LoggingService.error("failed new Regex", error);
+      }
       return [];
     }
     if (!this.idSet) {
@@ -248,6 +251,9 @@ export default class Autofill {
     try {
       regex = new RegExp(locator);
     } catch (error) {
+      if (error instanceof Error) {
+        LoggingService.error("failed new Regex", error);
+      }
       return [];
     }
     if (!this.xpathList) {
