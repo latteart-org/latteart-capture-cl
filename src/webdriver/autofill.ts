@@ -106,10 +106,8 @@ export default class Autofill {
   ): Promise<void> {
     try {
       if (value === "") {
-        const v1 = await target.getAttribute("value");
-        const v2 = await target.getText();
-        const length = v1.length > v2.length ? v1.length : v2.length;
-        for (let i = 0; length > i; i++) {
+        const v = await target.getAttribute("value");
+        for (let i = 0; v.length > i; i++) {
           await target.sendKeys(Key.BACK_SPACE);
         }
       } else {
