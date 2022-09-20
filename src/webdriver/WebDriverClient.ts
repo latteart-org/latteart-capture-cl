@@ -194,6 +194,12 @@ export default interface WebDriverClient extends ScriptExecutor {
   getElementByXpath(xpath: string): Promise<WebElement>;
 
   /**
+   * Get elements by xpath
+   * @param xpath
+   */
+  getElementsByXpath(xpath: string): Promise<WebElement[]>;
+
+  /**
    * Get element by id
    * @param id
    */
