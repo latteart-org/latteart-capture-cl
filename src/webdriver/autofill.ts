@@ -44,7 +44,6 @@ export default class Autofill {
         inputValueSet.locator,
         inputValueSet.locatorMatchType
       );
-      console.log(targetWebElements);
 
       for (const webElement of targetWebElements) {
         await this.currentWindow.sleep(250);
@@ -169,12 +168,10 @@ export default class Autofill {
     locatorMatchType: "equals" | "contains"
   ): Promise<WebElement[]> {
     try {
-      if (locatorType === "id" && locatorMatchType === "equals") {
-        return [await this.client.getElementById(locator)];
-      }
-
       return await this.client.getElementsByXpath(
-        locatorType === "id" && locatorMatchType === "contains"
+        locatorType === "id" && locatorMatchType === "equals"
+          ? `//*[@id="${locator}"]`
+          : locatorType === "id" && locatorMatchType === "contains"
           ? `//*[contains(@id,"${locator}")]`
           : locator
       );

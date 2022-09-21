@@ -181,24 +181,7 @@ describe("Autofill", () => {
   });
 
   describe("#getWebElements", () => {
-    it("一致するid要素を取得", async () => {
-      const webElementMock = { dummy: "dummy" };
-      const client: any = {
-        getElementById: jest.fn().mockResolvedValue(webElementMock),
-      };
-      const inputValueSets: InputValueSet[] = [];
-
-      const autofill = new Autofill(client, inputValueSets, currentWindow);
-      const result = await (autofill as any).getWebElements(
-        "id",
-        "locator",
-        "equals"
-      );
-
-      expect(client.getElementById).toHaveBeenCalledWith("locator");
-      expect(result).toEqual([webElementMock]);
-    });
-    it("xpath及びidのcontainsを取得", async () => {
+    it("一致する要素を取得", async () => {
       const webElementMock = [{ dummy: "dummy" }];
       const client: any = {
         getElementsByXpath: jest.fn().mockResolvedValue(webElementMock),

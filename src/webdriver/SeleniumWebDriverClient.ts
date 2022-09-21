@@ -421,10 +421,6 @@ export class SeleniumWebDriverClient implements WebDriverClient {
     return await this.driver.findElements(By.xpath(xpath));
   }
 
-  public async getElementById(id: string): Promise<WebElement> {
-    return await this.driver.findElement(By.id(id));
-  }
-
   public async getElementByTagName(tagName: string): Promise<WebElement[]> {
     return await this.driver.findElements(By.tagName(tagName));
   }
