@@ -426,6 +426,12 @@ export default class BrowserOperationCapturer {
     ) {
       throw new Error("InvalidOperationError");
     }
+    if (!this.webBrowser?.currentWindow) {
+      throw new Error("CurrentWindowNothing");
+    } else {
+      await this.webBrowser.currentWindow.removeScreenLock();
+    }
+
     try {
       switch (operation.type as SpecialOperationType) {
         case SpecialOperationType.ACCEPT_ALERT:
