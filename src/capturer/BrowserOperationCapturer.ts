@@ -481,7 +481,12 @@ export default class BrowserOperationCapturer {
               operation.elementInfo.tagname.toLowerCase()
             )
           ) {
-            await this.client.clearAndSendKeysToElement(xpath, operation.input);
+            const inputValue =
+              operation.elementInfo.attributes.type === "date"
+                ? "00" + operation.input
+                : operation.input;
+
+            await this.client.clearAndSendKeysToElement(xpath, inputValue);
           }
 
           return;
