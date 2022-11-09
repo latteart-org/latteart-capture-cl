@@ -24,7 +24,7 @@ import StandardLogger, { RunningMode } from "./logger/StandardLogger";
 import { AndroidDeviceAccessor } from "./device/AndroidDeviceAccessor";
 import { IOSDeviceAccessor } from "./device/IOSDeviceAccessor";
 import WebDriverClientFactory from "./webdriver/WebDriverClientFactory";
-import { Operation } from "./Operation";
+import { MinimumOperation } from "./Operation";
 import { ServerError, ServerErrorCode } from "./ServerError";
 import path from "path";
 import { TimestampImpl } from "./Timestamp";
@@ -306,7 +306,7 @@ io.on("connection", (socket) => {
             LoggingService.info("Run operation.");
             LoggingService.debug(operation);
 
-            const targetOperation: Operation = JSON.parse(operation);
+            const targetOperation: MinimumOperation = JSON.parse(operation);
             try {
               await capturer.runOperation(targetOperation);
               socket.emit(ServerToClientSocketIOEvent.RUN_OPERATION_COMPLETED);
