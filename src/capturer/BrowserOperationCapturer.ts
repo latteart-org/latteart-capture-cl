@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { MinimumOperation, Operation } from "../Operation";
+import { Operation } from "../Operation";
 import LoggingService from "../logger/LoggingService";
 import WebBrowser from "./browser/WebBrowser";
 import { CaptureConfig } from "../CaptureConfig";
@@ -423,7 +423,9 @@ export default class BrowserOperationCapturer {
    * Run operation.
    * @param operation Operation.
    */
-  public async runOperation(operation: MinimumOperation): Promise<void> {
+  public async runOperation(
+    operation: Pick<Operation, "input" | "type" | "elementInfo">
+  ): Promise<void> {
     if (
       ![
         SpecialOperationType.ACCEPT_ALERT,

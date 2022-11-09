@@ -16,14 +16,6 @@
 
 import { TimestampImpl } from "./Timestamp";
 
-export type MinimumOperation = {
-  input: string;
-  type: string;
-  elementInfo: ElementInfo | null;
-  title: string;
-  url: string;
-};
-
 /**
  * Screen element information.
  */
