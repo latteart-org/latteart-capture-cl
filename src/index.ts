@@ -305,10 +305,12 @@ io.on("connection", (socket) => {
 
         const runOperation = async (
           operation: string,
-          hasTransition: boolean
+          shouldWaitScreenTransition: boolean
         ) => {
           LoggingService.info(
-            `Run operation${hasTransition ? " and screen transition" : ""}.`
+            `Run operation${
+              shouldWaitScreenTransition ? " and screen transition" : ""
+            }.`
           );
           LoggingService.debug(operation);
 
@@ -318,7 +320,7 @@ io.on("connection", (socket) => {
           > = JSON.parse(operation);
           try {
             await capturer.runOperation(targetOperation);
-            if (!hasTransition) {
+            if (!shouldWaitScreenTransition) {
               socket.emit(ServerToClientSocketIOEvent.RUN_OPERATION_COMPLETED);
             }
           } catch (error) {
@@ -326,7 +328,7 @@ io.on("connection", (socket) => {
               throw error;
             }
 
-            const channel = hasTransition
+            const channel = shouldWaitScreenTransition
               ? ServerToClientSocketIOEvent.RUN_OPERATION_AND_SCREEN_TRANSITION_FAILED
               : ServerToClientSocketIOEvent.RUN_OPERATION_FAILED;
             if (error.message === "InvalidOperationError") {
