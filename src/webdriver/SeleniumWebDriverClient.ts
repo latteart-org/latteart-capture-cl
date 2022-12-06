@@ -268,10 +268,7 @@ export class SeleniumWebDriverClient implements WebDriverClient {
         throw new Error("timeout error");
       }
 
-      return await this.driver.executeScript(
-        `return (${script})(...arguments);`,
-        args
-      );
+      return await this.driver.executeScript(script, args);
     } catch (error) {
       if (error instanceof Error) {
         if (error.name == "NoSuchWindowError") {
@@ -280,25 +277,6 @@ export class SeleniumWebDriverClient implements WebDriverClient {
       }
       throw error;
     }
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public async executeAsync<T, U>(
-    script: (done: (returnValue: T) => void, args: U) => void,
-    args?: U
-  ): Promise<T | null> {
-    return this.driver.executeAsyncScript(
-      `
-        if (arguments.length === 0) {
-          return (${script})(arguments[0]);
-        } else {
-          return (${script})(arguments[arguments.length - 1], arguments[0]);
-        }
-      `,
-      args
-    );
   }
 
   /**
