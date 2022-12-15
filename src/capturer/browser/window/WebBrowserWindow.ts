@@ -212,7 +212,7 @@ export default class WebBrowserWindow {
       ) {
         this.noticeCapturedOperations(...capturedOperations);
       }
-      this.beforeOperation = capturedOperations[0];
+      this.beforeOperation = capturedOperations[0] ?? null;
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
         await this.client.sendKeys(
