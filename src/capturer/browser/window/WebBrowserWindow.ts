@@ -203,10 +203,15 @@ export default class WebBrowserWindow {
         capturedData,
       ]);
 
-      const operationsToBeRegistered =
-        this.collectOperationsToBeRegistered(capturedOperations);
-
-      this.noticeCapturedOperations(...operationsToBeRegistered);
+      if (
+        this.shouldRegisterOperation(
+          capturedOperations[0],
+          this.beforeOperation
+        )
+      ) {
+        this.noticeCapturedOperations(...capturedOperations);
+      }
+      this.beforeOperation = capturedOperations[0];
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
         await this.client.sendKeys(
@@ -557,48 +562,44 @@ export default class WebBrowserWindow {
     );
   }
 
-  private collectOperationsToBeRegistered(
-    operations: Operation[]
-  ): Operation[] {
-    return operations.filter((operation) => {
-      const beforeOperation = this.beforeOperation;
-      this.beforeOperation = operation;
+  private shouldRegisterOperation(
+    operation: Operation,
+    beforeOperation: Operation | null
+  ): boolean {
+    if (beforeOperation === null) {
+      return true;
+    }
 
-      if (beforeOperation === null) {
-        return true;
-      }
+    if (beforeOperation.url !== operation.url) {
+      return true;
+    }
 
-      if (beforeOperation.url !== operation.url) {
-        return true;
-      }
+    if (beforeOperation.elementInfo?.attributes.for === undefined) {
+      return true;
+    }
 
-      if (beforeOperation.elementInfo?.attributes.for === undefined) {
-        return true;
-      }
+    if (
+      beforeOperation.elementInfo?.attributes.for !==
+      operation.elementInfo?.attributes.id
+    ) {
+      return true;
+    }
 
-      if (
-        beforeOperation.elementInfo?.attributes.for !==
-        operation.elementInfo?.attributes.id
-      ) {
-        return true;
-      }
+    if (beforeOperation.elementInfo?.tagname.toUpperCase() !== "LABEL") {
+      return true;
+    }
 
-      if (beforeOperation.elementInfo?.tagname.toUpperCase() !== "LABEL") {
-        return true;
-      }
+    if (operation.elementInfo?.tagname.toUpperCase() === "INPUT") {
+      return true;
+    }
 
-      if (operation.elementInfo?.tagname.toUpperCase() === "INPUT") {
-        return true;
-      }
-
-      if (
-        ["CHECKBOX", "RADIO"].includes(
-          operation.elementInfo?.attributes.type.toUpperCase()
-        )
-      ) {
-        return true;
-      }
-      return false;
-    });
+    if (
+      ["CHECKBOX", "RADIO"].includes(
+        operation.elementInfo?.attributes.type.toUpperCase()
+      )
+    ) {
+      return true;
+    }
+    return false;
   }
 }
