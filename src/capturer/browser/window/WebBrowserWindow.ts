@@ -203,11 +203,8 @@ export default class WebBrowserWindow {
         capturedData,
       ]);
 
-      if (!capturedOperations[0]) {
-        return;
-      }
-
       if (
+        capturedOperations[0] &&
         this.shouldRegisterOperation(
           capturedOperations[0],
           this.beforeOperation
