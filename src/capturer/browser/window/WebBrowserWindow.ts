@@ -199,14 +199,14 @@ export default class WebBrowserWindow {
       return;
     }
     for (const capturedData of capturedDatas) {
-      const capturedOperation = await this.convertToCapturedOperation([
+      const capturedOperations = await this.convertToCapturedOperations([
         capturedData,
       ]);
 
-      const filterdCapturedOperations = capturedOperation.filter((operation) =>
-        this.filterNotRegisterOperation(operation)
-      );
-      this.noticeCapturedOperations(...filterdCapturedOperations);
+      const operationsToBeRegistered =
+        this.collectOperationsToBeRegistered(capturedOperations);
+
+      this.noticeCapturedOperations(...operationsToBeRegistered);
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
         await this.client.sendKeys(
@@ -463,7 +463,7 @@ export default class WebBrowserWindow {
     return before.replace(/\[1\]/g, "");
   }
 
-  private async convertToCapturedOperation(capturedDatas: CapturedData[]) {
+  private async convertToCapturedOperations(capturedDatas: CapturedData[]) {
     const filteredDatas = capturedDatas.filter((data) => {
       // Ignore the click event when dropdown list is opened because Selenium can not take a screenshot when dropdown list is opened.
       if (
@@ -557,27 +557,48 @@ export default class WebBrowserWindow {
     );
   }
 
-  private filterNotRegisterOperation(operation: Operation): boolean {
-    const beforeOperation = this.beforeOperation;
-    this.beforeOperation = operation;
+  private collectOperationsToBeRegistered(
+    operations: Operation[]
+  ): Operation[] {
+    return operations.filter((operation) => {
+      const beforeOperation = this.beforeOperation;
+      this.beforeOperation = operation;
 
-    if (beforeOperation === null) {
-      return true;
-    }
+      if (beforeOperation === null) {
+        return true;
+      }
 
-    if (
-      beforeOperation.url === operation.url &&
-      beforeOperation.elementInfo?.attributes.for !== undefined &&
-      beforeOperation.elementInfo?.attributes.for ===
-        operation.elementInfo?.attributes.id &&
-      beforeOperation.elementInfo?.tagname.toUpperCase() === "LABEL" &&
-      operation.elementInfo?.tagname.toUpperCase() === "INPUT" &&
-      ["CHECKBOX", "RADIO"].includes(
-        operation.elementInfo.attributes.type.toUpperCase()
-      )
-    ) {
+      if (beforeOperation.url !== operation.url) {
+        return true;
+      }
+
+      if (beforeOperation.elementInfo?.attributes.for === undefined) {
+        return true;
+      }
+
+      if (
+        beforeOperation.elementInfo?.attributes.for !==
+        operation.elementInfo?.attributes.id
+      ) {
+        return true;
+      }
+
+      if (beforeOperation.elementInfo?.tagname.toUpperCase() !== "LABEL") {
+        return true;
+      }
+
+      if (operation.elementInfo?.tagname.toUpperCase() === "INPUT") {
+        return true;
+      }
+
+      if (
+        ["CHECKBOX", "RADIO"].includes(
+          operation.elementInfo?.attributes.type.toUpperCase()
+        )
+      ) {
+        return true;
+      }
       return false;
-    }
-    return true;
+    });
   }
 }
