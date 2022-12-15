@@ -41,6 +41,7 @@ export default class WebBrowserWindow {
 
   private client: WebDriverClient;
   private _windowHandle: string;
+  private beforeOperation: Operation | null = null;
   private onGetOperation: (operation: Operation) => void;
   private onGetScreenTransition: (screenTransition: ScreenTransition) => void;
   private onHistoryChanged: (browserStatus: {
@@ -201,7 +202,11 @@ export default class WebBrowserWindow {
       const capturedOperation = await this.convertToCapturedOperation([
         capturedData,
       ]);
-      this.noticeCapturedOperations(...capturedOperation);
+
+      const filterdCapturedOperations = capturedOperation.filter((operation) =>
+        this.filterNotRegisterOperation(operation)
+      );
+      this.noticeCapturedOperations(...filterdCapturedOperations);
 
       if (capturedData.suspendedEvent.reFireFromWebdriverType === "inputDate") {
         await this.client.sendKeys(
@@ -550,5 +555,29 @@ export default class WebBrowserWindow {
         });
       })
     );
+  }
+
+  private filterNotRegisterOperation(operation: Operation): boolean {
+    const beforeOperation = this.beforeOperation;
+    this.beforeOperation = operation;
+
+    if (beforeOperation === null) {
+      return true;
+    }
+
+    if (
+      beforeOperation.url === operation.url &&
+      beforeOperation.elementInfo?.attributes.for !== undefined &&
+      beforeOperation.elementInfo?.attributes.for ===
+        operation.elementInfo?.attributes.id &&
+      beforeOperation.elementInfo?.tagname.toUpperCase() === "LABEL" &&
+      operation.elementInfo?.tagname.toUpperCase() === "INPUT" &&
+      ["CHECKBOX", "RADIO"].includes(
+        operation.elementInfo.attributes.type.toUpperCase()
+      )
+    ) {
+      return false;
+    }
+    return true;
   }
 }
