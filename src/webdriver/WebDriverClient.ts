@@ -26,16 +26,6 @@ export interface ScriptExecutor {
    * @param args The arguments passed to the script.
    */
   execute<T, U>(script: (args: U) => T, args?: U): Promise<T | null>;
-
-  /**
-   * Inject the script to current page content and execute the script.(async)
-   * @param script Script.
-   * @param args The arguments passed to the script.
-   */
-  executeAsync<T, U>(
-    script: (done: (returnValue: T) => void, args: U) => void,
-    args?: U
-  ): Promise<T | null>;
 }
 
 /**
