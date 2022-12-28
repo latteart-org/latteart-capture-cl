@@ -16,7 +16,7 @@
 
 import express from "express";
 import http from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import BrowserOperationCapturer from "./capturer/BrowserOperationCapturer";
 import { CaptureConfig } from "./CaptureConfig";
 import LoggingService from "./logger/LoggingService";
@@ -139,12 +139,13 @@ app.get(`${v1RootPath}/server-name`, (req, res) => {
 
   res.json("latteart-capture-cl");
 });
+let capturer: BrowserOperationCapturer;
+let client: WebDriverClient;
+const sockets: { socket: Socket | null } = { socket: null };
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
+  sockets.socket = socket;
   LoggingService.info("Socket connected.");
-
-  let capturer: BrowserOperationCapturer;
-  let client: WebDriverClient;
 
   /**
    * Start capture.
@@ -161,7 +162,7 @@ io.on("connection", (socket) => {
       );
 
       if (setupError) {
-        socket.emit(
+        sockets.socket?.emit(
           ServerToClientSocketIOEvent.ERROR_OCCURRED,
           JSON.stringify(setupError)
         );
@@ -184,17 +185,17 @@ io.on("connection", (socket) => {
 
         capturer = new BrowserOperationCapturer(client, captureConfig, {
           onGetOperation: (operation) => {
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.OPERATION_CAPTURED,
               JSON.stringify(operation)
             );
           },
           onGetScreenTransition: (screenTransition) => {
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.SCREEN_TRANSITION_CAPTURED,
               JSON.stringify(screenTransition)
             );
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.RUN_OPERATION_AND_SCREEN_TRANSITION_COMPLETED
             );
           },
@@ -208,7 +209,7 @@ io.on("connection", (socket) => {
             canGoForward: boolean;
           }) => {
             LoggingService.info("Browser history changed.");
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.BROWSER_HISTORY_CHANGED,
               JSON.stringify(browserStatus)
             );
@@ -224,13 +225,13 @@ io.on("connection", (socket) => {
               currentWindowHandle,
             });
             LoggingService.debug(windowsInfo);
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.BROWSER_WINDOWS_CHANGED,
               windowsInfo
             );
           },
           onAlertVisibilityChanged: (isVisible: boolean) => {
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.ALERT_VISIBLE_CHANGED,
               JSON.stringify({ isVisible: isVisible })
             );
@@ -243,7 +244,7 @@ io.on("connection", (socket) => {
               message: "Capture failed.",
             };
 
-            socket.emit(
+            sockets.socket?.emit(
               ServerToClientSocketIOEvent.ERROR_OCCURRED,
               JSON.stringify(serverError)
             );
@@ -256,7 +257,10 @@ io.on("connection", (socket) => {
         socket.on(ClientToServerSocketIOEvent.TAKE_SCREENSHOT, async () => {
           const screenshot = await capturer.getScreenshot();
 
-          socket.emit(ServerToClientSocketIOEvent.SCREENSHOT_TAKEN, screenshot);
+          sockets.socket?.emit(
+            ServerToClientSocketIOEvent.SCREENSHOT_TAKEN,
+            screenshot
+          );
         });
         socket.on(ClientToServerSocketIOEvent.BROWSER_BACK, () => {
           capturer.browserBack();
@@ -282,19 +286,21 @@ io.on("connection", (socket) => {
         socket.on(ClientToServerSocketIOEvent.PAUSE_CAPTURE, async () => {
           await capturer.pauseCapturing();
 
-          socket.emit(ServerToClientSocketIOEvent.CAPTURE_PAUSED);
+          sockets.socket?.emit(ServerToClientSocketIOEvent.CAPTURE_PAUSED);
         });
         socket.on(ClientToServerSocketIOEvent.RESUME_CAPTURE, async () => {
           await capturer.resumeCapturing();
 
-          socket.emit(ServerToClientSocketIOEvent.CAPTURE_RESUMED);
+          sockets.socket?.emit(ServerToClientSocketIOEvent.CAPTURE_RESUMED);
         });
         socket.on(
           ClientToServerSocketIOEvent.AUTOFILL,
           async (inputValueSets: string) => {
             try {
               await capturer.autofill(JSON.parse(inputValueSets));
-              socket.emit(ServerToClientSocketIOEvent.AUTOFILL_COMPLETED);
+              sockets.socket?.emit(
+                ServerToClientSocketIOEvent.AUTOFILL_COMPLETED
+              );
             } catch (e) {
               if (e instanceof Error) {
                 LoggingService.error("Autofill failed.", e);
@@ -321,7 +327,9 @@ io.on("connection", (socket) => {
           try {
             await capturer.runOperation(targetOperation);
             if (!shouldWaitScreenTransition) {
-              socket.emit(ServerToClientSocketIOEvent.RUN_OPERATION_COMPLETED);
+              sockets.socket?.emit(
+                ServerToClientSocketIOEvent.RUN_OPERATION_COMPLETED
+              );
             }
           } catch (error) {
             if (!(error instanceof Error)) {
@@ -336,14 +344,14 @@ io.on("connection", (socket) => {
                 code: ServerErrorCode.INVALID_OPERATION,
                 message: "Invalid operation.",
               };
-              socket.emit(channel, JSON.stringify(serverError));
+              sockets.socket?.emit(channel, JSON.stringify(serverError));
             }
             if (error.message === "ElementNotFound") {
               const serverError: ServerError = {
                 code: ServerErrorCode.ELEMENT_NOT_FOUND,
                 message: "Element not found.",
               };
-              socket.emit(channel, JSON.stringify(serverError));
+              sockets.socket?.emit(channel, JSON.stringify(serverError));
             }
           }
         };
@@ -361,7 +369,7 @@ io.on("connection", (socket) => {
         );
 
         await capturer.start(parsedUrl, () => {
-          socket.emit(
+          sockets.socket?.emit(
             ServerToClientSocketIOEvent.CAPTURE_STARTED,
             new TimestampImpl().epochMilliseconds().toString()
           );
@@ -379,7 +387,7 @@ io.on("connection", (socket) => {
             message: "Invalid url.",
           };
 
-          socket.emit(
+          sockets.socket?.emit(
             ServerToClientSocketIOEvent.ERROR_OCCURRED,
             JSON.stringify(serverError)
           );
@@ -403,7 +411,7 @@ io.on("connection", (socket) => {
             message: "WebDriver version mismatch.",
           };
 
-          socket.emit(
+          sockets.socket?.emit(
             ServerToClientSocketIOEvent.ERROR_OCCURRED,
             JSON.stringify(serverError)
           );
@@ -419,7 +427,7 @@ io.on("connection", (socket) => {
           message: "An unknown error has occurred.",
         };
 
-        socket.emit(
+        sockets.socket?.emit(
           ServerToClientSocketIOEvent.ERROR_OCCURRED,
           JSON.stringify(serverError)
         );
@@ -431,7 +439,7 @@ io.on("connection", (socket) => {
   );
 
   socket.on("disconnect", (reason: string) => {
-    capturer?.quit();
+    // capturer?.quit();
 
     if (reason === "ping timeout") {
       LoggingService.warn("Socket ping timeout.");
