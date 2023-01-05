@@ -19,7 +19,7 @@ Start capturing operations.
             "type": "string" // "PC" or "Android" or "iOS"
           },
           "browserName": {
-            "type": "string" // "Chrome" or "Safari"
+            "type": "string" // "Chrome" or "Safari"　or "Edge"
           },
           "device": {
             "type": "object",
@@ -40,6 +40,9 @@ Start capturing operations.
           },
           "waitTimeForStartupReload": {
             "type": "number" // seconds
+          },
+          "isHeadlessMode": {
+            "type": "boolean"
           }
         }
       }
@@ -48,14 +51,6 @@ Start capturing operations.
 #### `stop_capture`
 
 Stop capturing operations.
-
-#### `pause_capture`
-
-Pause capturing operations.
-
-#### `resume_capture`
-
-Resume capturing operations.
 
 #### `take_screenshot`
 
@@ -77,26 +72,51 @@ Switch capturing window.
   - destWindowHandle
     - type: string
 
-#### `run_operations`
+#### `unprotect_windows`
 
-Run operations.
+Unsuppress user interaction on all windows.
+
+#### `protect_windows`
+
+Suppress user interaction in all windows.
+
+#### `pause_capture`
+
+Pause capturing operations.
+
+#### `resume_capture`
+
+Resume capturing operations.
+
+#### `run_operation`
+
+Run operation.
 
 - arguments
-  - operations
+  - operation
     - type: string(json)
       ```json
       {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "input": {
-              "type": "string"
-            },
-            "type": {
-              "type": "string"
-            },
-            "elementInfo": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "imageData": {
+            "type": "string"
+          },
+          "windowHandle": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "screenElements": {
+            "type": "array",
+            "items": {
               "type": "object",
               "properties": {
                 "tagname": {
@@ -123,82 +143,36 @@ Run operations.
                   }
                 }
               }
-            },
-            "title": {
-              "type": "string"
-            },
-            "url": {
-              "type": "string"
-            },
-            "imageData": {
-              "type": "string"
-            },
-            "windowHandle": {
-              "type": "string"
-            },
-            "timestamp": {
-              "type": "string"
-            },
-            "screenElements": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "tagname": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  },
-                  "xpath": {
-                    "type": "string"
-                  },
-                  "checked": {
-                    "type": "boolean"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "patternProperties": {
-                      ".+$": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "pageSource": {
-              "type": "string"
-            },
-            "inputElements": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "tagname": {
-                    "type": "string"
-                  },
-                  "text": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  },
-                  "xpath": {
-                    "type": "string"
-                  },
-                  "checked": {
-                    "type": "boolean"
-                  },
-                  "attributes": {
-                    "type": "object",
-                    "patternProperties": {
-                      ".+$": {
-                        "type": "string"
-                      }
+            }
+          },
+          "pageSource": {
+            "type": "string"
+          },
+          "inputElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
                     }
                   }
                 }
@@ -208,59 +182,137 @@ Run operations.
         }
       }
       ```
-  - config
+
+#### `run_operation_and_screen_transition`
+
+Execution of operations involving screen transitions.
+
+- arguments
+  - operation
     - type: string(json)
       ```json
       {
         "type": "object",
         "properties": {
-          "platformName": {
-            "type": "string" // "PC" or "Android" or "iOS"
+          "title": {
+            "type": "string"
           },
-          "browserName": {
-            "type": "string" // "Chrome" or "Safari"
+          "url": {
+            "type": "string"
           },
-          "device": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string"
-              },
-              "name": {
-                "type": "string"
-              },
-              "osVersion": {
-                "type": "string"
+          "imageData": {
+            "type": "string"
+          },
+          "windowHandle": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "screenElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
+                    }
+                  }
+                }
               }
             }
           },
-          "platformVersion": {
+          "pageSource": {
             "type": "string"
           },
-          "waitTimeForStartupReload": {
-            "type": "number" // seconds
+          "inputElements": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "tagname": {
+                  "type": "string"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "xpath": {
+                  "type": "string"
+                },
+                "checked": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "object",
+                  "patternProperties": {
+                    ".+$": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
       ```
 
-#### `stop_run_operations`
+#### `enter_values`
 
-Stop running operations.
+Enter values for screen elements.
+
+- arguments
+  - inputValueSets
+    - type: string(json)
+      ```json
+      {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "locatorType": {
+              "type": "string" // "id" or "xpath"
+            },
+            "locator": {
+              "type": "string"
+            },
+            "locatorMatchType": {
+              "type": "string" // "equals" or "contains"
+            },
+            "inputValue": {
+              "type": "string"
+            }
+          }
+        }
+      }
+      ```
 
 ### server -> client
 
 #### `capture_started`
 
 Capturing has started.
-
-#### `capture_paused`
-
-Capturing has paused.
-
-#### `capture_resumed`
-
-Capturing has resumed.
 
 #### `operation_captured`
 
@@ -493,17 +545,33 @@ Alert dialog(alert, confirm, prompt) visibility has been changed.
       }
       ```
 
-#### `run_operations_completed`
+#### `capture_paused`
 
-Running operations has completed.
+Capturing has paused.
 
-#### `run_operations_canceled`
+#### `capture_resumed`
 
-Running operations has canceled.
+Capturing has resumed.
 
-#### `run_operations_aborted`
+#### `run_operation_completed`
 
-Running operations has aborted.
+Running operation has completed.
+
+#### `run_operation_failed`
+
+Notification of failed operation execution.
+
+#### `enter_values_completed`
+
+Notification that auto-filling of screen elements is complete.
+
+#### `run_operation_and_screen_transition_completed`
+
+Notification that the screen transition associated with the operation has been completed.
+
+#### `run_operation_and_screen_transition_failed`
+
+Notification to the effect that execution of operations involving screen transitions has failed.
 
 #### `error_occurred`
 
