@@ -49,5 +49,5 @@ dist/
 
 ## API ドキュメント
 
-- REST API リファレンス
-- WebSocket API リファレンス
+- [REST API リファレンス](https://latteart-org.github.io/latteart-capture-cl/)
+- [WebSocket API リファレンス](./socketIOEvents.md)
