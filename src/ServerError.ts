@@ -17,27 +17,26 @@
 /**
  * Server error code.
  */
-export enum ServerErrorCode {
-  DETECT_DEVICES_FAILED = "detect_devices_failed",
-  CAPTURE_FAILED = "capture_failed",
-  UNKNOWN_ERROR = "unknown_error",
-  INVALID_URL = "invalid_url",
-  WEB_DRIVER_VERSION_MISMATCH = "web_driver_version_mismatch",
-  WEB_DRIVER_NOT_READY = "web_driver_not_ready",
-  APPIUM_NOT_STARTED = "appium_not_started",
-  DEVICE_NOT_CONNECTED = "device_not_connected",
-  INVALID_OPERATION = "invalid_operation",
-  ELEMENT_NOT_FOUND = "element_not_found",
-}
+export type ServerErrorCode =
+  | "detect_devices_failed"
+  | "capture_failed"
+  | "unknown_error"
+  | "invalid_url"
+  | "web_driver_version_mismatch"
+  | "web_driver_not_ready"
+  | "appium_not_started"
+  | "device_not_connected"
+  | "invalid_operation"
+  | "element_not_found";
 
 /**
  * Server error.
  */
-export interface ServerError {
+export type ServerError = {
   /**
    * Error code.
    */
-  code: string;
+  code: ServerErrorCode;
 
   /**
    * Error message.
@@ -63,4 +62,4 @@ export interface ServerError {
      */
     target: string;
   }>;
-}
+};

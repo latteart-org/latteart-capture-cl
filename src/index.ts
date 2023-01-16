@@ -25,7 +25,7 @@ import { AndroidDeviceAccessor } from "./device/AndroidDeviceAccessor";
 import { IOSDeviceAccessor } from "./device/IOSDeviceAccessor";
 import WebDriverClientFactory from "./webdriver/WebDriverClientFactory";
 import { Operation } from "./Operation";
-import { ServerError, ServerErrorCode } from "./ServerError";
+import { ServerError } from "./ServerError";
 import path from "path";
 import { TimestampImpl } from "./Timestamp";
 import WebDriverClient from "./webdriver/WebDriverClient";
@@ -121,7 +121,7 @@ app.get(`${v1RootPath}/devices`, (req, res) => {
       LoggingService.error("Detect devices failed.", error);
 
       const serverError: ServerError = {
-        code: ServerErrorCode.DETECT_DEVICES_FAILED,
+        code: "detect_devices_failed",
         message: "Detect devices failed.",
       };
 
@@ -238,7 +238,7 @@ io.on("connection", (socket) => {
             LoggingService.error("Capture failed.", error);
 
             const serverError: ServerError = {
-              code: ServerErrorCode.CAPTURE_FAILED,
+              code: "capture_failed",
               message: "Capture failed.",
             };
 
@@ -329,14 +329,14 @@ io.on("connection", (socket) => {
               : ServerToClientSocketIOEvent.RUN_OPERATION_FAILED;
             if (error.message === "InvalidOperationError") {
               const serverError: ServerError = {
-                code: ServerErrorCode.INVALID_OPERATION,
+                code: "invalid_operation",
                 message: "Invalid operation.",
               };
               socket.emit(channel, JSON.stringify(serverError));
             }
             if (error.message === "ElementNotFound") {
               const serverError: ServerError = {
-                code: ServerErrorCode.ELEMENT_NOT_FOUND,
+                code: "element_not_found",
                 message: "Element not found.",
               };
               socket.emit(channel, JSON.stringify(serverError));
@@ -371,7 +371,7 @@ io.on("connection", (socket) => {
           LoggingService.error(`Invalid url.: ${parsedUrl}`);
 
           const serverError: ServerError = {
-            code: ServerErrorCode.INVALID_URL,
+            code: "invalid_url",
             message: "Invalid url.",
           };
 
@@ -395,7 +395,7 @@ io.on("connection", (socket) => {
           LoggingService.error("WebDriver version mismatch.", error);
 
           const serverError: ServerError = {
-            code: ServerErrorCode.WEB_DRIVER_VERSION_MISMATCH,
+            code: "web_driver_version_mismatch",
             message: "WebDriver version mismatch.",
           };
 
@@ -411,7 +411,7 @@ io.on("connection", (socket) => {
         LoggingService.error("An unknown error has occurred.", error);
 
         const serverError: ServerError = {
-          code: ServerErrorCode.UNKNOWN_ERROR,
+          code: "unknown_error",
           message: "An unknown error has occurred.",
         };
 
