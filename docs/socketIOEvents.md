@@ -11,7 +11,7 @@ Start capturing operations.
     - type: string
   - config
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -95,7 +95,7 @@ Run operation.
 - arguments
   - operation
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -190,7 +190,7 @@ Execution of operations involving screen transitions.
 - arguments
   - operation
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -285,7 +285,7 @@ Enter values for screen elements.
 - arguments
   - inputValueSets
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "array",
         "items": {
@@ -321,7 +321,7 @@ An operation has been captured.
 - arguments
   - operation
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -450,7 +450,7 @@ An screen transition has been captured.
 - arguments
   - screenTransition
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -491,7 +491,7 @@ Browser history(whether it can go back/forward or not) has been changed.
 - arguments
   - browserStatus
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -512,7 +512,7 @@ The number of opened windows has been changed.
 - arguments
   - windowInformation
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -536,7 +536,7 @@ Alert dialog(alert, confirm, prompt) visibility has been changed.
 - arguments
   - alertVisibleStatus
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
@@ -580,7 +580,7 @@ An error has occurred.
 - arguments
   - serverError
     - type: string(json)
-      ```json
+      ```jsonc
       {
         "type": "object",
         "properties": {
