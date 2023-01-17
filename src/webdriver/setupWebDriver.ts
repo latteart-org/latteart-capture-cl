@@ -19,7 +19,7 @@ import { ChildProcessWithoutNullStreams, spawn } from "child_process";
 import { Browser, CaptureConfig, PlatformName } from "../CaptureConfig";
 import WebDriverServer from "../WebDriverServer";
 import LoggingService from "../logger/LoggingService";
-import { ServerError, ServerErrorCode } from "../ServerError";
+import { ServerError } from "../ServerError";
 import { AndroidDeviceAccessor } from "../device/AndroidDeviceAccessor";
 import { IOSDeviceAccessor } from "../device/IOSDeviceAccessor";
 
@@ -48,7 +48,7 @@ export async function setupWebDriverServer(
       LoggingService.error("Appium is not ready.");
 
       const serverError: ServerError = {
-        code: ServerErrorCode.APPIUM_NOT_STARTED,
+        code: "appium_not_started",
         message: "Appium is not started.",
       };
 
@@ -57,7 +57,7 @@ export async function setupWebDriverServer(
 
     if (!(await deviceIsConnected(config.platformName, config.device.id))) {
       const serverError: ServerError = {
-        code: ServerErrorCode.DEVICE_NOT_CONNECTED,
+        code: "device_not_connected",
         message: "Device is not connected.",
       };
 
@@ -95,7 +95,7 @@ export async function setupWebDriverServer(
     LoggingService.error("WebDriver is not ready.");
 
     const serverError: ServerError = {
-      code: ServerErrorCode.WEB_DRIVER_NOT_READY,
+      code: "web_driver_not_ready",
       message: "WebDriver is not ready.",
     };
 

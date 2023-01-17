@@ -25,7 +25,7 @@ import { AndroidDeviceAccessor } from "./device/AndroidDeviceAccessor";
 import { IOSDeviceAccessor } from "./device/IOSDeviceAccessor";
 import WebDriverClientFactory from "./webdriver/WebDriverClientFactory";
 import { Operation } from "./Operation";
-import { ServerError, ServerErrorCode } from "./ServerError";
+import { ServerError } from "./ServerError";
 import path from "path";
 import { TimestampImpl } from "./Timestamp";
 import WebDriverClient from "./webdriver/WebDriverClient";
@@ -60,13 +60,13 @@ enum ClientToServerSocketIOEvent {
   BROWSER_BACK = "browser_back",
   BROWSER_FORWARD = "browser_forward",
   SWITCH_CAPTURING_WINDOW = "switch_capturing_window",
-  SWITCH_CANCEL = "switch_cancel",
-  SELECT_CAPTURING_WINDOW = "select_capturing_window",
+  UNPROTECT_WINDOWS = "unprotect_windows",
+  PROTECT_WINDOWS = "protect_windows",
   PAUSE_CAPTURE = "pause_capture",
   RESUME_CAPTURE = "resume_capture",
   RUN_OPERATION = "run_operation",
   RUN_OPERATION_AND_SCREEN_TRANSITION = "run_operation_and_screen_transition",
-  AUTOFILL = "autofill",
+  ENTER_VALUES = "enter_values",
 }
 
 /**
@@ -84,10 +84,9 @@ enum ServerToClientSocketIOEvent {
   CAPTURE_RESUMED = "capture_resumed",
   RUN_OPERATION_COMPLETED = "run_operation_completed",
   RUN_OPERATION_FAILED = "run_operation_failed",
-  AUTOFILL_COMPLETED = "autofill_completed",
+  ENTER_VALUES_COMPLETED = "enter_values_completed",
   RUN_OPERATION_AND_SCREEN_TRANSITION_COMPLETED = "run_operation_and_screen_transition_completed",
   RUN_OPERATION_AND_SCREEN_TRANSITION_FAILED = "run_operation_and_screen_transition_failed",
-  INVALID_OPERATION = "invalid_operation",
   ERROR_OCCURRED = "error_occurred",
 }
 
@@ -122,7 +121,7 @@ app.get(`${v1RootPath}/devices`, (req, res) => {
       LoggingService.error("Detect devices failed.", error);
 
       const serverError: ServerError = {
-        code: ServerErrorCode.DETECT_DEVICES_FAILED,
+        code: "detect_devices_failed",
         message: "Detect devices failed.",
       };
 
@@ -239,7 +238,7 @@ io.on("connection", (socket) => {
             LoggingService.error("Capture failed.", error);
 
             const serverError: ServerError = {
-              code: ServerErrorCode.CAPTURE_FAILED,
+              code: "capture_failed",
               message: "Capture failed.",
             };
 
@@ -270,15 +269,12 @@ io.on("connection", (socket) => {
             capturer.switchCapturingWindow(JSON.parse(destWindowHandle));
           }
         );
-        socket.on(ClientToServerSocketIOEvent.SWITCH_CANCEL, async () => {
+        socket.on(ClientToServerSocketIOEvent.UNPROTECT_WINDOWS, async () => {
           capturer.switchCancel();
         });
-        socket.on(
-          ClientToServerSocketIOEvent.SELECT_CAPTURING_WINDOW,
-          async () => {
-            capturer.selectCapturingWindow();
-          }
-        );
+        socket.on(ClientToServerSocketIOEvent.PROTECT_WINDOWS, async () => {
+          capturer.selectCapturingWindow();
+        });
         socket.on(ClientToServerSocketIOEvent.PAUSE_CAPTURE, async () => {
           await capturer.pauseCapturing();
 
@@ -290,11 +286,11 @@ io.on("connection", (socket) => {
           socket.emit(ServerToClientSocketIOEvent.CAPTURE_RESUMED);
         });
         socket.on(
-          ClientToServerSocketIOEvent.AUTOFILL,
+          ClientToServerSocketIOEvent.ENTER_VALUES,
           async (inputValueSets: string) => {
             try {
               await capturer.autofill(JSON.parse(inputValueSets));
-              socket.emit(ServerToClientSocketIOEvent.AUTOFILL_COMPLETED);
+              socket.emit(ServerToClientSocketIOEvent.ENTER_VALUES_COMPLETED);
             } catch (e) {
               if (e instanceof Error) {
                 LoggingService.error("Autofill failed.", e);
@@ -333,14 +329,14 @@ io.on("connection", (socket) => {
               : ServerToClientSocketIOEvent.RUN_OPERATION_FAILED;
             if (error.message === "InvalidOperationError") {
               const serverError: ServerError = {
-                code: ServerErrorCode.INVALID_OPERATION,
+                code: "invalid_operation",
                 message: "Invalid operation.",
               };
               socket.emit(channel, JSON.stringify(serverError));
             }
             if (error.message === "ElementNotFound") {
               const serverError: ServerError = {
-                code: ServerErrorCode.ELEMENT_NOT_FOUND,
+                code: "element_not_found",
                 message: "Element not found.",
               };
               socket.emit(channel, JSON.stringify(serverError));
@@ -375,7 +371,7 @@ io.on("connection", (socket) => {
           LoggingService.error(`Invalid url.: ${parsedUrl}`);
 
           const serverError: ServerError = {
-            code: ServerErrorCode.INVALID_URL,
+            code: "invalid_url",
             message: "Invalid url.",
           };
 
@@ -399,7 +395,7 @@ io.on("connection", (socket) => {
           LoggingService.error("WebDriver version mismatch.", error);
 
           const serverError: ServerError = {
-            code: ServerErrorCode.WEB_DRIVER_VERSION_MISMATCH,
+            code: "web_driver_version_mismatch",
             message: "WebDriver version mismatch.",
           };
 
@@ -415,7 +411,7 @@ io.on("connection", (socket) => {
         LoggingService.error("An unknown error has occurred.", error);
 
         const serverError: ServerError = {
-          code: ServerErrorCode.UNKNOWN_ERROR,
+          code: "unknown_error",
           message: "An unknown error has occurred.",
         };
 
