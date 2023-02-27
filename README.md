@@ -1,3 +1,7 @@
+# :warning: ARCHIVED
+
+This package has been moved into the [LatteArt monorepo](https://github.com/latteart-org/latteart/tree/main/packages/latteart-capture-cl).
+
 # LatteArt Capture CL
 
 LatteArt Capture CL is a service that capture users' operations on a web browser for LatteArt.
