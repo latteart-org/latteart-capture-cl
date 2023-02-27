@@ -1,3 +1,7 @@
+# :warning: ARCHIVED
+
+このパッケージは [LatteArt monorepo](https://github.com/latteart-org/latteart/tree/main/packages/latteart-capture-cl) に移動しました。
+
 # LatteArt Capture CL
 
 LatteArt で利用する操作履歴を取得するサービスです。
